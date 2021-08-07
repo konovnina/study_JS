@@ -1,8 +1,14 @@
 'use strict';
 
-//Проверка, является ли переменная числом
-let isNumber = function (n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+//Новая функция на замену isNumber, которая проверяет числовые и текстовые данные
+let checkType = function (data, type) {
+  if (type === 'num') {
+    return (!isNaN(parseFloat(data)) && isFinite(data) && (data !== null) && (data !== undefined));
+  }
+
+  if (type === 'str') {
+    return (isNaN(parseFloat(data)) && (data !== '') && (data !== null) && (data !== undefined));
+  }
 };
 
 let appData = {
@@ -11,6 +17,8 @@ let appData = {
   expenses: {},
   addExpenses: [],
   deposit: false,
+  percentDeposit: 0,
+  moneyDeposit: 0,
   mission: 50000,
   budget: 0,
   budgetDay: 0,
@@ -18,19 +26,41 @@ let appData = {
   expensesMonth: 0,
   period: 3,
   asking: function () {
-    let addExpenses = prompt('Перечислите возможные расходы за месяц через запятую:', 'Кредит, Коммуналка, Еда');
+
+    if (confirm('Есть ли у вас дополнительный заработок?')) {
+      let itemIncome;
+      do {
+        itemIncome = prompt('Какой у вас дополнительный заработок?', 'Таксую');
+      } while (!checkType(itemIncome, 'str'));
+      console.log(itemIncome);
+      let cashIncome;
+      do {
+        cashIncome = prompt('Сколько в месяц зарабатываете на этом?', 10000);
+      } while (!checkType(cashIncome, 'num'));
+      appData.income[itemIncome] = cashIncome; 
+    }
+
+    let addExpenses;
+    do {
+      addExpenses = prompt('Перечислите возможные расходы за месяц через запятую:', 'Кредит, Коммуналка, Еда');
+    } while (!checkType(addExpenses, 'str'));
+
     appData.addExpenses = addExpenses.toLowerCase().split(', ');
     appData.deposit = confirm('Есть ли у вас депозит в банке?');
   },
   getExpensesMonth: function () {
     for (let i = 0; i < 2; i++) {
-      appData.expenses[prompt(`Введите статью обязательных расходов №${i+1}:`)] = 0;
+      let itemExpenses;
+      do {
+        itemExpenses = prompt(`Введите статью обязательных расходов №${i + 1}:`);
+      } while (!checkType(itemExpenses, 'str'));
+      appData.expenses[itemExpenses] = 0;
     }
     for (let key in appData.expenses) {
       let n;
       do {
         n = prompt(`${key} - во сколько это обойдется?`);
-      } while (!isNumber(n));
+      } while (!checkType(n, 'num'));
       appData.expenses[key] = +n;
       appData.expensesMonth += appData.expenses[key];
     }
@@ -53,21 +83,43 @@ let appData = {
       return('Что-то полшло не так');
     }
   },
+
+  getInfoDeposit: function () {
+    if (appData.deposit) {
+      let itemPercentDeposit;
+      do {
+        itemPercentDeposit = prompt('Какой годовой процент?', 10);
+      } while (!checkType(itemPercentDeposit, 'num'));
+      appData.percentDeposit = itemPercentDeposit;
+
+      let itemMoneyDeposit;
+      do {
+        itemMoneyDeposit = prompt('Какая сумма заложена?', 10000);
+      } while (!checkType(itemMoneyDeposit, 'num'));
+      appData.moneyDeposit = itemMoneyDeposit;
+    }
+  },
+  
+  calcSavedMoney: function () {
+    return appData.budgetMonth * appData.period;
+  },
+  
 };
 
 let money;
 
 let start = function () {
   do {
-    money = prompt('Ваш месячный доход: ');
-  } while (!isNumber(money));
-  
+    money = prompt('Ваш месячный доход: ', 40000);
+  } while (!checkType(money, 'num'));
+
   appData.budget = money;
   appData.asking();
   appData.getExpensesMonth();
   appData.getBudget();
   appData.getTargetMonth();
-
+  appData.getInfoDeposit();
+  appData.calcSavedMoney();
   console.log(`Расходы за месяц: ${appData.expensesMonth}`);
 
   if (appData.period > 0) {
@@ -82,6 +134,14 @@ let start = function () {
   for (let key in appData) {
     console.log(key + ': ' + appData[key]);
   }
+
+  //Вывод массива addExpenses
+  let outputExpenses = [];
+  for (let key of appData.addExpenses) {
+    outputExpenses.push(key[0].toUpperCase() + key.slice(1))
+  }
+  console.log(outputExpenses.join(', '));
+
 };
 
 start();
