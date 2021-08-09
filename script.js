@@ -1,5 +1,38 @@
 'use strict';
 
+//Получение данных из DOM-дерева
+let startButton = document.getElementById('start');
+
+let buttons = document.getElementsByTagName('button');
+let addIncomeButton = buttons[0];
+let addExpensesButton = buttons[1];
+
+let depositCheckbox = document.querySelector('#deposit-check');
+
+let additionalIncome = document.querySelectorAll('.additional_income-item');
+let additionalExpenses = document.querySelector('.additional_expenses-item');
+
+let budgetMonthValue = document.querySelector('.budget_month-value');
+let budgetDayValue = document.getElementsByClassName('budget_day-value');
+let expensesMonthValue = document.getElementsByClassName('expenses_month-value');
+let additionalIncomeValue = document.getElementsByClassName('additional_income-value');
+let additionalExpensesValue = document.getElementsByClassName('additional_expenses-value');
+let incomePeriodValue = document.getElementsByClassName('income_period-value');
+let targetMonthValue = document.getElementsByClassName('target_month-value');
+
+let salaryAmount = document.querySelector('.salary-amount');
+
+let incomeTitle = document.querySelector('input.income-title');
+let incomeAmount = document.querySelector('.income-amount');
+
+let expensesTitle = document.querySelector('input.expenses-title');
+let expensesAmount = document.querySelector('.expenses-amount');
+
+let targetAmount = document.querySelector('.target-amount');
+
+let periodSelect = document.querySelector('.period-select');
+
+
 //Получение данных от пользователя
 let getValue = function (message, type, callback) {
   let value;
